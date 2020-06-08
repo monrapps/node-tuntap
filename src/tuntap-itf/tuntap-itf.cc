@@ -26,8 +26,6 @@
 #elif defined(__unix__) || defined(_POSIX_VERSION)
 /* This may not work, but still, try... */
 #include "tuntap-itf-linux.inc.cc"
-#elif defined(_WIN32) || defined(_WIN64)
-#include "tuntap-itf-windows.inc.cc"
 #else
 #error "Your operating system does not seems to be supported"
 #endif
