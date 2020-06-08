@@ -21,6 +21,11 @@
 
 #include "module.hh"
 
+#if defined(_WIN32) || defined(_WIN64)
+#define htobe32(x) htonl(x)
+#define be32toh(x) ntohl(x)
+#endif
+
 using namespace v8;
 
 Persistent<Function> Tuntap::constructor;
