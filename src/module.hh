@@ -37,7 +37,11 @@
 #include <cerrno>
 #include <cmath>
 
+#ifdef (__unix__)
 #include <unistd.h>
+#endif
+
+#include <io.h>
 
 #include "ethertypes.hh"
 #include "tuntap.hh"
