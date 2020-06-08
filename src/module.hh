@@ -37,7 +37,7 @@
 #include <cerrno>
 #include <cmath>
 
-#ifdef (__unix__)
+#ifdef __UNIX__
 #include <unistd.h>
 #endif
 
