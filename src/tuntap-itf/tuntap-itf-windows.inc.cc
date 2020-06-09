@@ -24,6 +24,8 @@
 #include <cerrno>
 #include <cstring>
 
+
+
 #include <uv.h>
 
 #include <sys/types.h>
@@ -36,6 +38,10 @@
 #include <fcntl.h>
 //#include <linux/fs.h>
 //#include <endian.h>
+
+
+//#include <Windows.h>
+#include <winioctl.h>
 
 /*
  * Static/local functions
@@ -58,9 +64,20 @@ static void ifreqPrep(struct ifreq *ifr, const char *itf_name) {
 template <typename T>
 static bool doIoctl(int fd, int opt, T data) {
 		int ret;
-		ret = ioctl(fd, opt, data);
-		if(ret < 0)
+		DeviceIoControl(fd,
+			(DWORD)opt,
+			&data,				// Ptr to InBuffer
+			sizeof(data),							// Length of InBuffer
+			&data,				// Ptr to OutBuffer
+			sizeof(data),							// Length of OutBuffer
+			NULL,						// BytesReturned
+			NULL);						// Ptr to Overlapped structure
+
+		DWORD ret = GetLastError();
+		if (ret != ERROR_SUCCESS) {
+			printf("DeviceIoControl TAP_IOCTL_SET_MEDIA_STATUS failed with error 0x%x\n", ret);
 			return(false);
+		}
 		return(true);
 	}
 
