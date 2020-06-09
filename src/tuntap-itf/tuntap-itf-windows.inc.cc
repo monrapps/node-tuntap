@@ -63,7 +63,7 @@ static void ifreqPrep(struct ifreq *ifr, const char *itf_name) {
 
 template <typename T>
 static bool doIoctl(int fd, int opt, T data) {
-		int ret;
+		DWORD ret;
 		DeviceIoControl(fd,
 			(DWORD)opt,
 			&data,				// Ptr to InBuffer
@@ -73,7 +73,7 @@ static bool doIoctl(int fd, int opt, T data) {
 			NULL,						// BytesReturned
 			NULL);						// Ptr to Overlapped structure
 
-		DWORD ret = GetLastError();
+		ret = GetLastError();
 		if (ret != ERROR_SUCCESS) {
 			printf("DeviceIoControl TAP_IOCTL_SET_MEDIA_STATUS failed with error 0x%x\n", ret);
 			return(false);
