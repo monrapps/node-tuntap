@@ -46,6 +46,78 @@
 /*
  * Static/local functions
  */
+const std::wstring DriverConnector::GetDeviceGuid()
+{
+	LPCWSTR AdapterKey = L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}";
+	HKEY regAdapters;
+
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, AdapterKey, NULL, KEY_READ, &regAdapters) != ERROR_SUCCESS) {
+		printf("RegOpenKeyEx Error\n");
+		return std::wstring(L"");
+	}
+
+	wchar_t name[128];
+	DWORD name_size;
+
+	for (DWORD i = 0;; i++) {
+		name_size = 127;
+		if (RegEnumKeyEx(
+			regAdapters,	//HKEY      hKey,
+			i,				//DWORD     dwIndex,
+			name,			//LPWSTR    lpName,
+			&name_size,		//LPDWORD   lpcchName,
+			NULL,			//LPDWORD   lpReserved,
+			NULL,			//LPWSTR    lpClass,
+			NULL,			//LPDWORD   lpcchClass,
+			NULL			//PFILETIME lpftLastWriteTime
+		) == ERROR_NO_MORE_ITEMS)
+			break;
+
+		//std::wcout << i << L": " << name << std::endl;
+
+		wchar_t data[256];
+		DWORD data_size = 255;
+
+		LSTATUS ret;
+		ret = RegGetValue(
+			HKEY_LOCAL_MACHINE,			//HKEY    hkey,
+			(std::wstring(AdapterKey) + std::wstring(L"\\") + std::wstring(name)).c_str(),			//LPWSTR  lpSubKey,
+			L"ComponentId",				//LPWSTR  lpValue,
+			RRF_RT_REG_SZ,				//DWORD   dwFlags,
+			NULL,						//LPDWORD pdwType,
+			data,						//PVOID   pvData,
+			&data_size)					//LPDWORD pcbData
+			;
+
+		if (ERROR_SUCCESS == ret) {
+			if (!_wcsnicmp(data, L"tap0901", 7)) {
+				wchar_t instance_id[128];
+				DWORD instance_id_size = 127;
+				if (ERROR_SUCCESS == RegGetValue(
+					HKEY_LOCAL_MACHINE,				//HKEY    hkey,
+					(std::wstring(AdapterKey) + std::wstring(L"\\") + std::wstring(name)).c_str(),
+					L"NetCfgInstanceId",			//LPCSTR  lpValue,
+					RRF_RT_REG_SZ,					//DWORD   dwFlags,
+					NULL,							//LPDWORD pdwType,
+					instance_id,					//PVOID   pvData,
+					&instance_id_size)				//LPDWORD pcbData
+					)
+				{
+					//std::wcout << L"instance id: " << instance_id << std::endl;
+					return std::wstring(instance_id);
+				}
+			}
+		}
+
+		DWORD code = GetLastError();
+		if (code != ERROR_SUCCESS) {
+			printf("numero do erro 0x%x\n", code);
+		}
+	}
+
+	return std::wstring(L"");
+}
+
 static void ifreqPrep(struct ifreq *ifr, const char *itf_name) {
 	memset(ifr, 0, sizeof(*ifr));
 	
