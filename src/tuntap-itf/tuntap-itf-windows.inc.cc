@@ -51,7 +51,7 @@ const std::wstring DriverConnector::GetDeviceGuid()
 	LPCWSTR AdapterKey = L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}";
 	HKEY regAdapters;
 
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, AdapterKey, NULL, KEY_READ, &regAdapters) != ERROR_SUCCESS) {
+	if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, AdapterKey, NULL, KEY_READ, &regAdapters) != ERROR_SUCCESS) {
 		printf("RegOpenKeyEx Error\n");
 		return std::wstring(L"");
 	}
@@ -61,7 +61,7 @@ const std::wstring DriverConnector::GetDeviceGuid()
 
 	for (DWORD i = 0;; i++) {
 		name_size = 127;
-		if (RegEnumKeyEx(
+		if (RegEnumKeyExW(
 			regAdapters,	//HKEY      hKey,
 			i,				//DWORD     dwIndex,
 			name,			//LPWSTR    lpName,
@@ -79,7 +79,7 @@ const std::wstring DriverConnector::GetDeviceGuid()
 		DWORD data_size = 255;
 
 		LSTATUS ret;
-		ret = RegGetValue(
+		ret = RegGetValueW	(
 			HKEY_LOCAL_MACHINE,			//HKEY    hkey,
 			(std::wstring(AdapterKey) + std::wstring(L"\\") + std::wstring(name)).c_str(),			//LPWSTR  lpSubKey,
 			L"ComponentId",				//LPWSTR  lpValue,
@@ -93,7 +93,7 @@ const std::wstring DriverConnector::GetDeviceGuid()
 			if (!_wcsnicmp(data, L"tap0901", 7)) {
 				wchar_t instance_id[128];
 				DWORD instance_id_size = 127;
-				if (ERROR_SUCCESS == RegGetValue(
+				if (ERROR_SUCCESS == RegGetValueW(
 					HKEY_LOCAL_MACHINE,				//HKEY    hkey,
 					(std::wstring(AdapterKey) + std::wstring(L"\\") + std::wstring(name)).c_str(),
 					L"NetCfgInstanceId",			//LPCSTR  lpValue,
