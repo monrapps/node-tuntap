@@ -75,7 +75,7 @@ static bool doIoctl(int fd, int opt, T data) {
 
 		ret = GetLastError();
 		if (ret != ERROR_SUCCESS) {
-			printf("DeviceIoControl TAP_IOCTL_SET_MEDIA_STATUS failed with error 0x%x\n", ret);
+			printf("DeviceIoControl failed with error 0x%x\n", ret);
 			return(false);
 		}
 		return(true);
